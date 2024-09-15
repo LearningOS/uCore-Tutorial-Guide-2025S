@@ -17,8 +17,8 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'uCore-Tutorial-Guide-2024S'
-copyright = 'OS2024Spring'
+project = 'uCore-Tutorial-Guide-2024A'
+copyright = 'OS2024Apring'
 author = 'Yifan Wu'
 language = 'zh_CN'
 html_search_language = 'zh'
@@ -37,7 +37,7 @@ extensions = [
 
 comments_config = {
    "utterances": {
-       "repo": "LearningOS/uCore-Tutorial-Guide-2024S",
+       "repo": "LearningOS/uCore-Tutorial-Guide-2024A",
        "issue-term": "pathname",
        "label": "comments",
        "theme": "github-light",

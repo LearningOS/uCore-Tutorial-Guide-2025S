@@ -66,10 +66,10 @@
 
 .. code-block:: console
 
-   $ git clone https://github.com/LearningOS/uCore-Tutorial-Code-2024S.git
-   $ cd uCore-Tutorial-Code-2024S
+   $ git clone https://github.com/LearningOS/uCore-Tutorial-Code-2024A.git
+   $ cd uCore-Tutorial-Code-2024A
    $ git checkout ch8
-   $ git clone https://github.com/LearningOS/uCore-Tutorial-Test-2024S.git user
+   $ git clone https://github.com/LearningOS/uCore-Tutorial-Test-2024A.git user
 
 或者你也可以在自己原来的仓库里 fetch 它，记得更新测例仓库的代码。
 
