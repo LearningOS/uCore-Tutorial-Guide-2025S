@@ -299,33 +299,43 @@
 </div>
 <div class="section" id="id2">
 <h2>编程作业<a class="headerlink" href="#id2" title="永久链接至标题">¶</a></h2>
-<div class="section" id="sys-gettimeofday-taskinfo">
-<h3>重新实现 sys_gettimeofday以及 taskinfo<a class="headerlink" href="#sys-gettimeofday-taskinfo" title="永久链接至标题">¶</a></h3>
-<p>引入虚存机制后，原来内核的 sys_gettimeofday 以及对应的获取 taskinfo 信息的函数实现就无效了。请你重写这个函数，恢复其正常功能。</p>
-<p>完成后你应该能够正确执行 ch3b_sleep* 以及 ch3_taskinfo 对应的测例。通过 <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span> <span class="pre">CHAPTER=4_3</span> <span class="pre">BASE=1</span></code> 来测试你的实现。</p>
-<p>tips:</p>
+<div class="section" id="sys-gettimeofday-sys-trace">
+<h3>重新实现 sys_gettimeofday 以及 sys_trace<a class="headerlink" href="#sys-gettimeofday-sys-trace" title="永久链接至标题">¶</a></h3>
+<p>引入虚存机制后，原来内核的 <code class="docutils literal notranslate"><span class="pre">sys_gettimeofday</span></code> 和 <code class="docutils literal notranslate"><span class="pre">sys_trace</span></code> 函数实现就无效了。 <strong>请你重写这两个系统调用的代码</strong>，恢复其正常功能。</p>
+<p>此外，由于本章我们有了地址空间作为隔离机制，所以 <code class="docutils literal notranslate"><span class="pre">sys_trace</span></code> <strong>需要考虑一些额外的情况</strong>：</p>
 <ul class="simple">
-<li><p>抄框架其他传指针的 syscall 实现。</p></li>
+<li><p>在读取（<code class="docutils literal notranslate"><span class="pre">trace_request</span></code> 为 0）时，如果对应地址用户不可见或不可读，则返回值应为 -1（<code class="docutils literal notranslate"><span class="pre">int</span></code> 的 -1，而非 <code class="docutils literal notranslate"><span class="pre">uint8_t</span></code>）。</p></li>
+<li><p>在写入（<code class="docutils literal notranslate"><span class="pre">trace_request</span></code> 为 1）时，如果对应地址用户不可见或不可写，则返回值应为 -1（<code class="docutils literal notranslate"><span class="pre">int</span></code> 的 -1，而非 <code class="docutils literal notranslate"><span class="pre">uint8_t</span></code>）。</p></li>
 </ul>
+<div class="admonition hint">
+<p class="admonition-title">提示</p>
+<ul class="simple">
+<li><p>参考框架其他传指针的 syscall 实现。</p></li>
+</ul>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">小心</p>
+<ul class="simple">
+<li><p>测例 <code class="docutils literal notranslate"><span class="pre">ch4_trace1.c</span></code> 依赖下面的 mmap 和 munmap 实现。你需要正确实现 map 和 munmap 后才能完全通过此测例。</p></li>
+</ul>
+</div>
 </div>
 <div class="section" id="mmap">
 <h3>mmap 匿名映射<a class="headerlink" href="#mmap" title="永久链接至标题">¶</a></h3>
-<p>你有没有想过，当你在 C++ 语言中写下的 <code class="docutils literal notranslate"><span class="pre">new</span> <span class="pre">int[100];</span></code> 执行时可能会发生哪些事情？你可能已经发现，目前我们给用户程序的内存都是固定的并没有增长的能力，这些程序是不能执行 <code class="docutils literal notranslate"><span class="pre">new</span></code> 这类导致内存使用增加的操作。libc 中通过 <a class="reference external" href="https://linux.die.net/man/2/sbrk">sbrk</a> 系统调用增加进程可使用的堆空间，这也是本来的题目设计，但是一位热心的往年助教J学长表示：这一点也不酷！他推荐了另一个申请内存的系统调用。</p>
-<p><a class="reference external" href="https://man7.org/linux/man-pages/man2/mmap.2.html">mmap</a> 本身主要使用来在内存中映射文件的，这里我们简化它的功能，仅仅使用匿名映射。</p>
-<p>mmap 系统调用新定义：</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">mmap</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">start</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">len</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">port</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">flag</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">fd</span><span class="p">)</span><span class="w"></span>
+<p><a class="reference external" href="https://man7.org/linux/man-pages/man2/mmap.2.html">mmap</a> 在 Linux 中主要用于在内存中映射文件，本次实验简化它的功能，仅使用匿名映射来申请内存。</p>
+<p>请实现 mmap 和 munmap 系统调用，mmap 定义如下：</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">mmap</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">start</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">len</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">prot</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">flags</span><span class="p">)</span><span class="w"></span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>syscall ID：222</p></li>
-<li><p>功能：申请长度为 len 字节的匿名物理内存（不要求实际物理内存位置，可以随便找一块），并映射到 addr 开始的虚存，内存页属性为 port。</p></li>
+<li><p>功能：申请长度为 <code class="docutils literal notranslate"><span class="pre">len</span></code> 字节的匿名物理内存（不要求实际物理内存位置，可以随便找一块），并映射到 <code class="docutils literal notranslate"><span class="pre">addr</span></code> 开始的虚拟地址，内存页属性为 <code class="docutils literal notranslate"><span class="pre">prot</span></code>。</p></li>
 <li><dl class="simple">
 <dt>参数：</dt><dd><ul>
-<li><p>start：需要映射的虚存起始地址。</p></li>
-<li><p>len：映射字节长度，可以为 0 （如果是则直接返回），不可过大(上限 1GiB )。</p></li>
-<li><p>port：第 0 位表示是否可读，第 1 位表示是否可写，第 2 位表示是否可执行。其他位无效（必须为 0 ）。</p></li>
-<li><p>flag：目前始终为 0，忽略该参数。</p></li>
-<li><p>fd：目前始终为 0, 忽略该参数。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">start</span></code>：需要映射的虚存起始地址。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">len</span></code>：映射字节长度，可以为 0。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">prot</span></code>：第 0 位表示是否可读，第 1 位表示是否可写，第 2 位表示是否可执行。其他位无效且必须为0。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">flags</span></code>：默认为 <code class="docutils literal notranslate"><span class="pre">MAP_ANONYMOUS</span></code>，可忽略该参数。</p></li>
 </ul>
 </dd>
 </dl>
@@ -339,32 +349,32 @@
 </li>
 <li><dl class="simple">
 <dt>说明：</dt><dd><ul>
-<li><p>为了简单，addr 要求按页对齐(否则报错)，len 可直接按页上取整。</p></li>
+<li><p>为了简单， <code class="docutils literal notranslate"><span class="pre">addr</span></code> 要求按页对齐(否则报错)， <code class="docutils literal notranslate"><span class="pre">len</span></code> 可直接按页上取整。</p></li>
 <li><p>为了简单，不考虑分配失败时的页回收。</p></li>
-<li><p>flag, fd 参数留待后续实验拓展。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">flags</span></code> 参数留待后续实验拓展。</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
 <dt>错误：</dt><dd><ul>
-<li><p>[addr, addr + len) 存在已经被映射的页。</p></li>
+<li><p>[<code class="docutils literal notranslate"><span class="pre">addr</span></code>, <code class="docutils literal notranslate"><span class="pre">addr</span> <span class="pre">+</span> <span class="pre">len</span></code>) 存在已经被映射的页。</p></li>
 <li><p>物理内存不足。</p></li>
-<li><p>port &amp; ~0x7 == 0，port 其他位必须为 0</p></li>
-<li><p>port &amp; 0x7 != 0，不可读不可写不可执行的内存无意义</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">prot</span> <span class="pre">&amp;</span> <span class="pre">~0x7</span> <span class="pre">==</span> <span class="pre">0</span></code>， <code class="docutils literal notranslate"><span class="pre">prot</span></code> 其他位必须为 0</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">prot</span> <span class="pre">&amp;</span> <span class="pre">0x7</span> <span class="pre">!=</span> <span class="pre">0</span></code>，不可读不可写不可执行的内存无意义</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 </ul>
-<p>munmap 系统调用新定义：</p>
+<p>munmap 系统调用定义如下：</p>
 <div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">munmap</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">start</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">len</span><span class="p">)</span><span class="w"></span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>syscall ID：215</p></li>
-<li><p>功能：取消一块虚存的映射。</p></li>
-<li><p>参数：同 mmap</p></li>
+<li><p>功能：取消到虚拟地址区间 [<code class="docutils literal notranslate"><span class="pre">start</span></code>, <code class="docutils literal notranslate"><span class="pre">start</span> <span class="pre">+</span> <span class="pre">len</span></code>) 的映射。</p></li>
+<li><p>参数和返回值：参考 mmap</p></li>
 <li><dl class="simple">
 <dt>说明：</dt><dd><ul>
 <li><p>为了简单，参数错误时不考虑内存的恢复和回收。</p></li>
@@ -374,25 +384,27 @@
 </li>
 <li><dl class="simple">
 <dt>错误：</dt><dd><ul>
-<li><p>[start, start + len) 中存在未被映射的虚存。</p></li>
+<li><p>[<code class="docutils literal notranslate"><span class="pre">start</span></code>, <code class="docutils literal notranslate"><span class="pre">start</span> <span class="pre">+</span> <span class="pre">len</span></code>) 中存在未被映射的虚存。</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 </ul>
 <p>正确实现后，你的 os 应该能够正确运行 ch4_* 对应的一些测试用例，<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span> <span class="pre">BASE=0</span></code> 来执行测试。</p>
-<p>tips:</p>
+<div class="admonition hint">
+<p class="admonition-title">提示</p>
 <ul class="simple">
-<li><p>匿名映射的页可以使用 kalloc() 得到。</p></li>
-<li><p>注意 kalloc 不支持连续物理内存分配，所以你必须把多个页的 mmap 逐页进行映射。</p></li>
-<li><p>一定要注意 mmap 是的页表项，注意 riscv 页表项的格式与 port 的区别。</p></li>
+<li><p>匿名映射的页可以使用 <code class="docutils literal notranslate"><span class="pre">kalloc()</span></code> 得到。</p></li>
+<li><p>注意 <code class="docutils literal notranslate"><span class="pre">kalloc</span></code> 不支持连续物理内存分配，所以你必须把多个页的 mmap 逐页进行映射。</p></li>
+<li><p>一定要注意 mmap 是的页表项，注意 riscv 页表项的格式与 <code class="docutils literal notranslate"><span class="pre">prot</span></code> 的区别。</p></li>
 <li><p>你增加 PTE_U 了吗？</p></li>
 </ul>
+</div>
 </div>
 <div class="section" id="id4">
 <h3>实验要求<a class="headerlink" href="#id4" title="永久链接至标题">¶</a></h3>
 <p>实现分支：ch4。</p>
-<p>实现 mmap 和 munmap 两个系统调用，通过所有测例。</p>
+<p>实现 mmap 和 munmap 两个系统调用，修复 gettimeofday 和 trace，通过所有测例。</p>
 <p>实验目录请参考 ch3，报告命名 lab2.md/pdf</p>
 </div>
 </div>
@@ -437,7 +449,7 @@
 <div class="section" id="id6">
 <h2>报告要求<a class="headerlink" href="#id6" title="永久链接至标题">¶</a></h2>
 <ul class="simple">
-<li><p>注意目录要求，报告命名 <code class="docutils literal notranslate"><span class="pre">lab2.md``（或</span> <span class="pre">pdf），位于</span> <span class="pre">``reports</span></code> 目录下。命名错误视作没有提交。不需要删除 <code class="docutils literal notranslate"><span class="pre">lab1.md</span></code>。后续实验同理。</p></li>
+<li><p>注意目录要求，报告命名 <code class="docutils literal notranslate"><span class="pre">lab2.md</span></code> （或 pdf），位于 <code class="docutils literal notranslate"><span class="pre">reports</span></code> 目录下。命名错误视作没有提交。不需要删除 <code class="docutils literal notranslate"><span class="pre">lab1.md</span></code>。后续实验同理。</p></li>
 <li><p>简单总结本次实验你新添加的代码。</p></li>
 <li><p>完成 ch4 问答作业。</p></li>
 <li><p>推荐markdown文档格式。</p></li>
@@ -522,7 +534,7 @@
 <li><a class="reference internal" href="#">chapter4练习</a><ul>
 <li><a class="reference internal" href="#id1">本章任务</a></li>
 <li><a class="reference internal" href="#id2">编程作业</a><ul>
-<li><a class="reference internal" href="#sys-gettimeofday-taskinfo">重新实现 sys_gettimeofday以及 taskinfo</a></li>
+<li><a class="reference internal" href="#sys-gettimeofday-sys-trace">重新实现 sys_gettimeofday 以及 sys_trace</a></li>
 <li><a class="reference internal" href="#mmap">mmap 匿名映射</a></li>
 <li><a class="reference internal" href="#id4">实验要求</a></li>
 </ul>

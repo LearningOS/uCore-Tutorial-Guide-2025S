@@ -300,6 +300,10 @@
 </div>
 <div class="section" id="id2">
 <h2>编程作业<a class="headerlink" href="#id2" title="永久链接至标题">¶</a></h2>
+<div class="section" id="syscall">
+<h3>关于之前的 syscall<a class="headerlink" href="#syscall" title="永久链接至标题">¶</a></h3>
+<p>你仍需要迁移上一章的 <code class="docutils literal notranslate"><span class="pre">sys_gettimeofday</span></code> <code class="docutils literal notranslate"><span class="pre">sys_mmap</span></code> <code class="docutils literal notranslate"><span class="pre">sys_munmap</span></code> 以适应新的进程结构。不过， <strong>从本章节开始，不再要求维护 sys_trace 这一系统调用</strong>。</p>
+</div>
 <div class="section" id="id3">
 <h3>进程创建<a class="headerlink" href="#id3" title="永久链接至标题">¶</a></h3>
 <p>大家一定好奇过为啥进程创建要用 fork + execve 这么一个奇怪的系统调用，就不能直接搞一个新进程吗？思而不学则殆，我们就来试一试！这章的编程练习请大家实现一个完全 DIY 的系统调用 spawn，用以创建一个新进程。</p>
@@ -414,7 +418,7 @@
 </div>
 <div class="section" id="id6">
 <h2>报告要求<a class="headerlink" href="#id6" title="永久链接至标题">¶</a></h2>
-<p>注意目录要求，报告命名 <code class="docutils literal notranslate"><span class="pre">lab3.md</span></code>，位于 <code class="docutils literal notranslate"><span class="pre">reports</span></code> 目录下。 后续实验同理。</p>
+<p>注意目录要求，报告命名 <code class="docutils literal notranslate"><span class="pre">lab3.md</span></code> ，位于 <code class="docutils literal notranslate"><span class="pre">reports</span></code> 目录下。 后续实验同理。</p>
 <ul class="simple">
 <li><p>注明姓名学号。</p></li>
 <li><p>简单总结你实现的功能（200字以内，不要贴代码）。</p></li>
@@ -498,6 +502,7 @@
 <li><a class="reference internal" href="#">chapter5练习</a><ul>
 <li><a class="reference internal" href="#id1">本章任务</a></li>
 <li><a class="reference internal" href="#id2">编程作业</a><ul>
+<li><a class="reference internal" href="#syscall">关于之前的 syscall</a></li>
 <li><a class="reference internal" href="#id3">进程创建</a></li>
 <li><a class="reference internal" href="#stride">stride 调度算法</a></li>
 <li><a class="reference internal" href="#id4">实验要求</a></li>
