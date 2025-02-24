@@ -43,8 +43,10 @@ Windows10 的用户可以通过系统内置的 WSL2 虚拟机（请不要使用 
      # 设置默认为 WSL 2，如果 Windows 版本不够，这条命令会出错
      >> wsl --set-default-version 2
 
--  `下载 Linux 内核安装包 <https://docs.microsoft.com/zh-cn/windows/wsl/install-win10#step-4---download-the-linux-kernel-update-package>`_
--  在微软商店（Microsoft Store）中搜索并安装 Ubuntu18.04 / 20.04。
+之后你可以选择任意方式安装：
+1. 直接在微软商店（Microsoft Store）中搜索并安装 Ubuntu （18.04或以上均可）。
+2. 或者，也可以选择 `从命令行手动下载 <https://docs.microsoft.com/zh-cn/windows/wsl/install-win10#step-4---download-the-linux-kernel-update-package>`_
+
 
 C 开发环境配置
 -------------------------------------------
