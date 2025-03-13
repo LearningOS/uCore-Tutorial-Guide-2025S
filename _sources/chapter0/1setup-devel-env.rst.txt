@@ -219,7 +219,7 @@ Qemu 模拟器安装
 GDB 调试支持
 ------------------------------
 
-在 ``os`` 目录下 ``make debug`` 可以调试我们的内核，这里需要基于 riscv64 平台的 gdb 调试器 ``riscv64-unknown-elf-gdb`` 。该调试器包含在 riscv64 gcc 工具链中，工具链的预编译版本可以在如下链接处下载：
+这里需要基于 riscv64 平台的 gdb 调试器 ``riscv64-unknown-elf-gdb`` 。该调试器包含在 riscv64 gcc 工具链中，工具链的预编译版本可以在如下链接处下载：
 
 - `Ubuntu 平台 <https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-linux-ubuntu14.tar.gz>`_
 - `macOS 平台 <https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-apple-darwin.tar.gz>`_
@@ -227,6 +227,22 @@ GDB 调试支持
 - `CentOS 平台 <https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-linux-centos6.tar.gz>`_
 
 解压后在 ``bin`` 目录下即可找到 ``riscv64-unknown-elf-gdb`` 以及另外一些常用工具 ``objcopy/objdump/readelf`` 等。
+
+之后下有两种方式可以调试内核：
+
+1.  **在项目根目录下** 输入 ``make debug`` 命令，会自动切分终端为两个 ``tmux`` 窗口，其中包含了 Qemu 的运行窗口和 GDB 的调试窗口。
+2.  如果不想要 ``tmux``，也可以 **在项目根目录下** 同时打开两个终端，在第一个终端中输入 ``make gdbserver``，然后在第二个终端中输入 ``make gdbclient``。此时可以在在第一个终端中看到内核的输出，在第二个终端中调试输出。
+
+进入 GDB 后代码运行在 bootloader，可以通过如下命令快速跳到内核入口处：
+
+.. code-block:: bash
+
+   b *0x80200000
+   c 
+
+.. warning::
+
+   目前 2025S 下发的 uCore 代码仓库中，你的 Makefile 可能不是最新的。如果运行以上指令出现问题，请将 `此处第114-124行代码 <https://git.tsinghua.edu.cn/os-lab/2025s/public/ucore-tutorial-code-2025s/-/blob/ch3/Makefile?ref_type=heads#L114-124>`_ 复制到你的 Makefile 中，替换原先的 ``debug:`` 任务。
 
 VSCode 可视化调试支持
 ------------------------------

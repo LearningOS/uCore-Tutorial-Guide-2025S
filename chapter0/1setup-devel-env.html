@@ -466,7 +466,7 @@ qemu-riscv64 --version
 </div>
 <div class="section" id="gdb">
 <h2>GDB 调试支持<a class="headerlink" href="#gdb" title="永久链接至标题">¶</a></h2>
-<p>在 <code class="docutils literal notranslate"><span class="pre">os</span></code> 目录下 <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">debug</span></code> 可以调试我们的内核，这里需要基于 riscv64 平台的 gdb 调试器 <code class="docutils literal notranslate"><span class="pre">riscv64-unknown-elf-gdb</span></code> 。该调试器包含在 riscv64 gcc 工具链中，工具链的预编译版本可以在如下链接处下载：</p>
+<p>这里需要基于 riscv64 平台的 gdb 调试器 <code class="docutils literal notranslate"><span class="pre">riscv64-unknown-elf-gdb</span></code> 。该调试器包含在 riscv64 gcc 工具链中，工具链的预编译版本可以在如下链接处下载：</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-linux-ubuntu14.tar.gz">Ubuntu 平台</a></p></li>
 <li><p><a class="reference external" href="https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-apple-darwin.tar.gz">macOS 平台</a></p></li>
@@ -474,6 +474,20 @@ qemu-riscv64 --version
 <li><p><a class="reference external" href="https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-linux-centos6.tar.gz">CentOS 平台</a></p></li>
 </ul>
 <p>解压后在 <code class="docutils literal notranslate"><span class="pre">bin</span></code> 目录下即可找到 <code class="docutils literal notranslate"><span class="pre">riscv64-unknown-elf-gdb</span></code> 以及另外一些常用工具 <code class="docutils literal notranslate"><span class="pre">objcopy/objdump/readelf</span></code> 等。</p>
+<p>之后下有两种方式可以调试内核：</p>
+<ol class="arabic simple">
+<li><p><strong>在项目根目录下</strong> 输入 <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">debug</span></code> 命令，会自动切分终端为两个 <code class="docutils literal notranslate"><span class="pre">tmux</span></code> 窗口，其中包含了 Qemu 的运行窗口和 GDB 的调试窗口。</p></li>
+<li><p>如果不想要 <code class="docutils literal notranslate"><span class="pre">tmux</span></code>，也可以 <strong>在项目根目录下</strong> 同时打开两个终端，在第一个终端中输入 <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">gdbserver</span></code>，然后在第二个终端中输入 <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">gdbclient</span></code>。此时可以在在第一个终端中看到内核的输出，在第二个终端中调试输出。</p></li>
+</ol>
+<p>进入 GDB 后代码运行在 bootloader，可以通过如下命令快速跳到内核入口处：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>b *0x80200000
+c
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>目前 2025S 下发的 uCore 代码仓库中，你的 Makefile 可能不是最新的。如果运行以上指令出现问题，请将 <a class="reference external" href="https://git.tsinghua.edu.cn/os-lab/2025s/public/ucore-tutorial-code-2025s/-/blob/ch3/Makefile?ref_type=heads#L114-124">此处第114-124行代码</a> 复制到你的 Makefile 中，替换原先的 <code class="docutils literal notranslate"><span class="pre">debug:</span></code> 任务。</p>
+</div>
 </div>
 <div class="section" id="vscode">
 <h2>VSCode 可视化调试支持<a class="headerlink" href="#vscode" title="永久链接至标题">¶</a></h2>
