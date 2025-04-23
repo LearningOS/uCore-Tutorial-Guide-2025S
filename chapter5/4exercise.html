@@ -353,11 +353,11 @@
 </div>
 <ul class="simple">
 <li><p>功能描述：设定进程优先级
-* syscall ID: 140
-* 功能：设定进程优先级。
-* 说明：设定自身进程优先级，只要 prio 在 [2, isize_max] 就成功，返回 prio，否则返回 -1。</p></li>
+- syscall ID: 140
+- 功能：设定进程优先级。
+- 说明：设定自身进程优先级，只要 prio 在 [2, isize_max] 就成功，返回 prio，否则返回 -1。</p></li>
 <li><p>针对测例
-* <cite>ch5_setprio</cite></p></li>
+- <cite>ch5_setprio</cite></p></li>
 </ul>
 <p>完成之后你需要调整框架的代码调度机制，是的可以设置不同进程优先级之后可以按照 stride 算法进行调度。实现正确后，代码应该能够通过用户测例 ch5t_stride*。最终输出的 priority 和 exitcode 应该大致成正比，由于我们的时间片比较粗糙，qemu 的模拟也不是十分准确，我们最终的 CI 测试会允许最大 30% 的误差。</p>
 <p>实现 tips:</p>
