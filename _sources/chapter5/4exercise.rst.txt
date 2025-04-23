@@ -5,8 +5,8 @@ chapter5练习
 
 本章任务
 ----------------------------------------
-- ``make test BASE=1`` 执行 usershell，然后运行 ``ch5b_usertest``。
-- merge ch4 的修改，运行 ``ch5_mergetest`` 检查 merge 是否正确。
+- ``make test BASE=1`` 执行 usershell，然后输入 ``ch5b_usertest`` 运行。
+- merge ch4 的修改（如有需要，可以 ``make test BASE=2`` 然后输入 ``ch5_mergetest`` 运行，以此检查 merge 是否正确，但这不是实验必需要求）。
 - 结合文档和代码理解 fork, exec, wait 的逻辑。结合课堂内容回答本章问答问题（注意第二问为选做）。
 - 理解框架的调度机制，尤其要搞明白时钟中断的处理机制以及 yield 之后下一个进程的选择。在次基础上，完成本节的编程作业(2)stride 调度算法。
 - 完成本章编程作业。
